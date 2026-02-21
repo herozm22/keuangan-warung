@@ -3,34 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WarungPro - Keuangan Digital</title>
+    <title>WarungPro - Dashboard Keuangan</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; }
         .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .chart-container { position: relative; height: 280px; width: 100%; }
-        input, select { background: rgba(15, 23, 42, 0.8) !important; border: 1px solid #334155 !important; color: white !important; }
+        input { background: #1e293b !important; border: 1px solid #334155 !important; color: white !important; }
     </style>
 </head>
-<body class="text-slate-200 min-h-screen pb-10">
+<body class="bg-[#0f172a] text-slate-200 min-h-screen pb-20">
 
-    <div id="modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="glass-card w-full max-w-md p-6 rounded-3xl shadow-2xl">
-            <h2 id="modalTitle" class="text-xl font-bold mb-4">Tambah Data</h2>
+    <div id="modal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="glass-card w-full max-w-sm p-6 rounded-3xl border border-blue-500/30">
+            <h2 id="modalTitle" class="text-xl font-bold mb-4 text-blue-400">Tambah Data</h2>
             <div class="space-y-4">
-                <div>
-                    <label class="text-xs text-slate-400">Keterangan</label>
-                    <input type="text" id="desc" class="w-full p-3 rounded-xl mt-1" placeholder="Contoh: Jual Beras">
-                </div>
-                <div>
-                    <label class="text-xs text-slate-400">Jumlah (Rp)</label>
-                    <input type="number" id="amount" class="w-full p-3 rounded-xl mt-1" placeholder="0">
-                </div>
-                <div class="flex gap-2 pt-2">
-                    <button onclick="closeModal()" class="flex-1 py-3 rounded-xl bg-slate-700 font-semibold">Batal</button>
-                    <button onclick="saveData()" class="flex-1 py-3 rounded-xl bg-blue-600 font-semibold text-white">Simpan</button>
+                <input type="text" id="desc" class="w-full p-4 rounded-2xl outline-none" placeholder="Keterangan transaksi">
+                <input type="number" id="amount" class="w-full p-4 rounded-2xl outline-none" placeholder="Jumlah Rp">
+                <div class="flex gap-2">
+                    <button onclick="closeModal()" class="flex-1 p-4 rounded-2xl bg-slate-700 font-bold hover:bg-slate-600 transition">Batal</button>
+                    <button onclick="saveData()" class="flex-1 p-4 rounded-2xl bg-blue-600 font-bold hover:bg-blue-500 transition shadow-lg shadow-blue-500/20">Simpan</button>
                 </div>
             </div>
         </div>
@@ -39,56 +32,60 @@
     <header class="p-6 flex justify-between items-center border-b border-slate-800 sticky top-0 bg-[#0f172a]/80 backdrop-blur-md z-10">
         <div>
             <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">WarungPro</h1>
-            <p class="text-[10px] text-slate-500 uppercase tracking-widest">Finance Management</p>
+            <p class="text-xs text-slate-500 font-medium tracking-wide">MANAJEMEN KEUANGAN MODERN</p>
         </div>
-        <div class="h-10 w-10 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center font-bold shadow-lg shadow-blue-500/20">W</div>
+        <button onclick="if(confirm('Hapus semua data?')) { localStorage.clear(); location.reload(); }" class="h-10 w-10 rounded-xl bg-slate-800 flex items-center justify-center text-rose-500 border border-slate-700">🗑</button>
     </header>
 
     <main class="p-4 max-w-5xl mx-auto space-y-6">
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="glass-card p-5 rounded-2xl border-b-4 border-emerald-500/50">
-                <p class="text-slate-400 text-xs font-semibold uppercase">Pemasukan</p>
-                <h3 id="totalIn" class="text-2xl font-bold text-emerald-400 mt-1">Rp 0</h3>
+            <div class="glass-card p-5 rounded-2xl">
+                <p class="text-slate-400 text-sm">Total Pemasukan</p>
+                <h3 id="totalIn" class="text-2xl font-bold text-emerald-400">Rp 0</h3>
             </div>
-            <div class="glass-card p-5 rounded-2xl border-b-4 border-rose-500/50">
-                <p class="text-slate-400 text-xs font-semibold uppercase">Pengeluaran</p>
-                <h3 id="totalOut" class="text-2xl font-bold text-rose-400 mt-1">Rp 0</h3>
+            <div class="glass-card p-5 rounded-2xl">
+                <p class="text-slate-400 text-sm">Total Pengeluaran & Gaji</p>
+                <h3 id="totalOut" class="text-2xl font-bold text-rose-400">Rp 0</h3>
             </div>
-            <div class="glass-card p-5 rounded-2xl border-b-4 border-blue-500/50">
-                <p class="text-slate-400 text-xs font-semibold uppercase">Saldo</p>
-                <h3 id="balance" class="text-2xl font-bold text-blue-400 mt-1">Rp 0</h3>
+            <div class="glass-card p-5 rounded-2xl border-l-4 border-l-blue-500">
+                <p class="text-slate-400 text-sm font-bold">Saldo Bersih</p>
+                <h3 id="balance" class="text-2xl font-bold text-blue-400">Rp 0</h3>
             </div>
         </div>
 
         <div class="glass-card p-6 rounded-3xl">
-            <div class="chart-container">
+            <h3 class="font-semibold mb-4 text-slate-400">Tren Keuangan Minggu Ini</h3>
+            <div style="height: 250px; position: relative;">
                 <canvas id="financeChart"></canvas>
             </div>
         </div>
 
-        <div class="grid grid-cols-3 gap-3">
-            <button onclick="openModal('income')" class="bg-emerald-600/20 text-emerald-400 border border-emerald-600/30 p-3 rounded-2xl text-xs font-bold hover:bg-emerald-600 hover:text-white transition">+ MASUK</button>
-            <button onclick="openModal('expense')" class="bg-rose-600/20 text-rose-400 border border-rose-600/30 p-3 rounded-2xl text-xs font-bold hover:bg-rose-600 hover:text-white transition">- KELUAR</button>
-            <button onclick="openModal('salary')" class="bg-blue-600/20 text-blue-400 border border-blue-600/30 p-3 rounded-2xl text-xs font-bold hover:bg-blue-600 hover:text-white transition">👤 GAJI</button>
+        <div class="flex flex-wrap gap-2 overflow-x-auto pb-2">
+            <button onclick="openModal('income')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-xl text-sm font-bold transition flex-shrink-0 shadow-lg shadow-emerald-500/20">+ Penghasilan</button>
+            <button onclick="openModal('expense')" class="bg-rose-600 hover:bg-rose-500 text-white px-6 py-3 rounded-xl text-sm font-bold transition flex-shrink-0 shadow-lg shadow-rose-500/20">+ Pengeluaran</button>
+            <button onclick="openModal('salary')" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl text-sm font-bold transition flex-shrink-0 shadow-lg shadow-blue-500/20">+ Gaji Karyawan</button>
         </div>
 
         <div class="glass-card rounded-3xl overflow-hidden">
-            <div class="p-4 border-b border-slate-800 bg-slate-800/30">
-                <h3 class="font-bold text-sm">Transaksi Terakhir</h3>
+            <div class="p-5 border-b border-slate-800 flex justify-between items-center">
+                <h3 class="font-bold">Riwayat Transaksi</h3>
+                <span class="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-1 rounded-full font-bold uppercase">Update Otomatis</span>
             </div>
-            <div id="historyList" class="divide-y divide-slate-800 max-h-[400px] overflow-y-auto">
+            <div id="historyList" class="divide-y divide-slate-800">
                 </div>
         </div>
     </main>
 
     <script>
-        let transactions = JSON.parse(localStorage.getItem('warungData')) || [];
+        // Inisialisasi Data dari LocalStorage
+        let transactions = JSON.parse(localStorage.getItem('warungV3')) || [];
         let currentType = '';
 
         function openModal(type) {
             currentType = type;
-            document.getElementById('modalTitle').innerText = type === 'income' ? 'Tambah Pemasukan' : (type === 'salary' ? 'Bayar Gaji' : 'Tambah Pengeluaran');
+            document.getElementById('modalTitle').innerText = 
+                type === 'income' ? 'Tambah Penghasilan' : (type === 'salary' ? 'Input Gaji' : 'Tambah Pengeluaran');
             document.getElementById('modal').classList.remove('hidden');
         }
 
@@ -101,45 +98,62 @@
         function saveData() {
             const desc = document.getElementById('desc').value;
             const amount = parseInt(document.getElementById('amount').value);
-            if(!desc || !amount) return alert('Isi dulu bos!');
+            
+            if(!desc || !amount) return alert('Mohon isi data dengan lengkap!');
 
-            transactions.unshift({ id: Date.now(), type: currentType, desc, amount, date: new Date().toLocaleDateString('id-ID') });
-            localStorage.setItem('warungData', JSON.stringify(transactions));
-            render();
+            transactions.unshift({
+                id: Date.now(),
+                type: currentType,
+                desc: desc,
+                amount: amount,
+                date: new Date().toLocaleDateString('id-ID', {day: '2-digit', month: 'short'})
+            });
+
+            localStorage.setItem('warungV3', JSON.stringify(transactions));
             closeModal();
+            render();
         }
 
         function deleteData(id) {
             transactions = transactions.filter(t => t.id !== id);
-            localStorage.setItem('warungData', JSON.stringify(transactions));
+            localStorage.setItem('warungV3', JSON.stringify(transactions));
             render();
         }
 
         function render() {
             const list = document.getElementById('historyList');
             let tIn = 0, tOut = 0;
+            let chartLabels = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
+            let chartIn = [0,0,0,0,0,0,0], chartOut = [0,0,0,0,0,0,0];
+
             list.innerHTML = '';
+            
+            if(transactions.length === 0) {
+                list.innerHTML = '<div class="p-10 text-center text-slate-600 text-sm italic">Belum ada transaksi</div>';
+            }
 
-            transactions.forEach(t => {
-                if(t.type === 'income') tIn += t.amount;
-                else tOut += t.amount;
+            transactions.forEach((t, idx) => {
+                if(t.type === 'income') {
+                    tIn += t.amount;
+                    chartIn[6] += t.amount / 1000; // Contoh visual ke hari ini
+                } else {
+                    tOut += t.amount;
+                    chartOut[6] += t.amount / 1000;
+                }
 
-                const color = t.type === 'income' ? 'text-emerald-400' : 'text-rose-400';
-                const prefix = t.type === 'income' ? '+' : '-';
-                const icon = t.type === 'income' ? '📈' : (t.type === 'salary' ? '👤' : '📉');
+                const isSalary = t.type === 'salary';
+                const colorClass = t.type === 'income' ? 'text-emerald-400' : (isSalary ? 'text-slate-200' : 'text-rose-400');
+                const borderClass = isSalary ? 'border-l-4 border-l-blue-500' : '';
 
                 list.innerHTML += `
-                    <div class="p-4 flex justify-between items-center animate-fade-in">
-                        <div class="flex items-center gap-3">
-                            <div class="text-xl">${icon}</div>
-                            <div>
-                                <p class="font-semibold text-sm">${t.desc}</p>
-                                <p class="text-[10px] text-slate-500 uppercase">${t.date}</p>
-                            </div>
+                    <div class="p-4 flex justify-between items-center hover:bg-slate-800/50 transition ${borderClass}">
+                        <div>
+                            <p class="font-medium text-sm text-slate-200">${t.desc}</p>
+                            <p class="text-[11px] text-slate-500 italic">Kategori: ${t.type.toUpperCase()} | ${t.date}</p>
                         </div>
                         <div class="text-right">
-                            <p class="font-bold ${color}">${prefix}Rp ${t.amount.toLocaleString()}</p>
-                            <button onclick="deleteData(${t.id})" class="text-[9px] text-slate-500 hover:text-rose-500 uppercase font-bold">Hapus</button>
+                            <p class="font-bold ${colorClass}">${t.type === 'income' ? '+' : '-'}Rp ${t.amount.toLocaleString()}</p>
+                            <button onclick="deleteData(${t.id})" class="text-[10px] text-rose-500 hover:text-rose-400 font-bold uppercase tracking-tighter">Hapus</button>
                         </div>
                     </div>`;
             });
@@ -147,30 +161,52 @@
             document.getElementById('totalIn').innerText = 'Rp ' + tIn.toLocaleString();
             document.getElementById('totalOut').innerText = 'Rp ' + tOut.toLocaleString();
             document.getElementById('balance').innerText = 'Rp ' + (tIn - tOut).toLocaleString();
-            updateChart();
+
+            updateChart(chartIn, chartOut);
         }
 
-        function updateChart() {
+        let myChart;
+        function updateChart(dataIn, dataOut) {
             const ctx = document.getElementById('financeChart').getContext('2d');
-            if (window.myChart) window.myChart.destroy();
+            if (myChart) myChart.destroy();
 
-            window.myChart = new Chart(ctx, {
+            myChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['S', 'S', 'R', 'K', 'J', 'S', 'M'],
-                    datasets: [{
-                        label: 'Alur Kas',
-                        data: [0, 0, 0, 0, 0, 0, transactions.length ? transactions[0].amount/1000 : 0],
-                        borderColor: '#60a5fa',
-                        borderWidth: 2,
-                        fill: true,
-                        backgroundColor: 'rgba(96, 165, 250, 0.1)',
-                        tension: 0.4,
-                        pointRadius: 2,
-                        pointHoverRadius: 5
-                    }]
+                    labels: ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'],
+                    datasets: [
+                        {
+                            label: 'Masuk (k)',
+                            data: dataIn,
+                            borderColor: '#10b981',
+                            tension: 0.4,
+                            borderWidth: 2,
+                            pointRadius: 3,
+                            fill: false
+                        },
+                        {
+                            label: 'Keluar (k)',
+                            data: dataOut,
+                            borderColor: '#f43f5e',
+                            tension: 0.4,
+                            borderWidth: 2,
+                            pointRadius: 3,
+                            fill: false
+                        }
+                    ]
                 },
-                options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#475569' } } } }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { labels: { color: '#94a3b8', font: { size: 10 } } } 
+                    },
+                    scales: {
+                        y: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { size: 10 } } },
+                        x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 10 } } }
+                    },
+                    interaction: { intersect: false, mode: 'index' }
+                }
             });
         }
 
