@@ -92,33 +92,82 @@
 
     <script>
         const ctx = document.getElementById('financeChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'],
-                datasets: [{
-                    label: 'Pemasukan',
-                    data: [12, 19, 15, 25, 22, 30, 45],
-                    borderColor: '#10b981',
-                    tension: 0.4,
-                    fill: false
-                }, {
-                    label: 'Pengeluaran',
-                    data: [8, 12, 10, 15, 12, 20, 10],
-                    borderColor: '#f43f5e',
-                    tension: 0.4,
-                    fill: false
-                }]
+
+// Buat warna gradasi untuk Pemasukan (Hijau)
+const gradientIn = ctx.createLinearGradient(0, 0, 0, 400);
+gradientIn.addColorStop(0, 'rgba(16, 185, 129, 0.4)');
+gradientIn.addColorStop(1, 'rgba(16, 185, 129, 0)');
+
+// Buat warna gradasi untuk Pengeluaran (Merah)
+const gradientOut = ctx.createLinearGradient(0, 0, 0, 400);
+gradientOut.addColorStop(0, 'rgba(244, 63, 94, 0.4)');
+gradientOut.addColorStop(1, 'rgba(244, 63, 94, 0)');
+
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'],
+        datasets: [{
+            label: 'Pemasukan',
+            data: [1500000, 2300000, 1800000, 3100000, 2800000, 3500000, 4200000],
+            borderColor: '#10b981',
+            backgroundColor: gradientIn,
+            fill: true,
+            tension: 0.4, // Membuat garis melengkung smooth
+            borderWidth: 3,
+            pointRadius: 4,
+            pointBackgroundColor: '#10b981'
+        }, {
+            label: 'Pengeluaran',
+            data: [1000000, 1500000, 1200000, 1800000, 1400000, 2500000, 2100000],
+            borderColor: '#f43f5e',
+            backgroundColor: gradientOut,
+            fill: true,
+            tension: 0.4,
+            borderWidth: 3,
+            pointRadius: 4,
+            pointBackgroundColor: '#f43f5e'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: true,
+                position: 'top',
+                labels: { color: '#94a3b8', font: { size: 12, weight: '600' } }
             },
-            options: {
-                responsive: true,
-                plugins: { legend: { labels: { color: '#94a3b8' } } },
-                scales: {
-                    y: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } },
-                    x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+            tooltip: {
+                backgroundColor: '#1e293b',
+                titleColor: '#f8fafc',
+                bodyColor: '#f8fafc',
+                borderColor: '#334155',
+                borderWidth: 1,
+                padding: 12,
+                displayColors: true,
+                callbacks: {
+                    label: function(context) {
+                        return ' ' + context.dataset.label + ': Rp ' + context.parsed.y.toLocaleString('id-ID');
+                    }
                 }
             }
-        });
+        },
+        scales: {
+            y: {
+                grid: { color: 'rgba(30, 41, 59, 0.5)', drawBorder: false },
+                ticks: { 
+                    color: '#94a3b8',
+                    callback: function(value) { return 'Rp ' + (value/1000000) + 'jt'; }
+                }
+            },
+            x: {
+                grid: { display: false },
+                ticks: { color: '#94a3b8' }
+            }
+        }
+    }
+});
     </script>
 </body>
 </html>
