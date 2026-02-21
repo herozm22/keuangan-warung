@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WarungPro - Dashboard Keuangan</title>
+    <title>WarungPro - Dashboard Keuangan & Bon</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; }
         .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        input { background: #1e293b !important; border: 1px solid #334155 !important; color: white !important; }
+        input, textarea { background: #1e293b !important; border: 1px solid #334155 !important; color: white !important; }
+        .tab-active { border-bottom: 2px solid #3b82f6; color: #3b82f6; }
     </style>
 </head>
 <body class="bg-[#0f172a] text-slate-200 min-h-screen pb-20">
@@ -19,73 +20,80 @@
         <div class="glass-card w-full max-w-sm p-6 rounded-3xl border border-blue-500/30">
             <h2 id="modalTitle" class="text-xl font-bold mb-4 text-blue-400">Tambah Data</h2>
             <div class="space-y-4">
-                <input type="text" id="desc" class="w-full p-4 rounded-2xl outline-none" placeholder="Keterangan transaksi">
-                <input type="number" id="amount" class="w-full p-4 rounded-2xl outline-none" placeholder="Jumlah Rp">
+                <input type="text" id="desc" class="w-full p-4 rounded-2xl outline-none" placeholder="Keterangan / Nama Pelanggan">
+                <textarea id="detail" class="w-full p-4 rounded-2xl outline-none hidden" placeholder="Detail Pesanan (misal: Beras 2kg, Telur 1/2kg)"></textarea>
+                <input type="number" id="amount" class="w-full p-4 rounded-2xl outline-none" placeholder="Total Rp">
                 <div class="flex gap-2">
-                    <button onclick="closeModal()" class="flex-1 p-4 rounded-2xl bg-slate-700 font-bold hover:bg-slate-600 transition">Batal</button>
-                    <button onclick="saveData()" class="flex-1 p-4 rounded-2xl bg-blue-600 font-bold hover:bg-blue-500 transition shadow-lg shadow-blue-500/20">Simpan</button>
+                    <button onclick="closeModal()" class="flex-1 p-4 rounded-2xl bg-slate-700 font-bold">Batal</button>
+                    <button onclick="saveData()" class="flex-1 p-4 rounded-2xl bg-blue-600 font-bold shadow-lg shadow-blue-500/20">Simpan</button>
                 </div>
             </div>
         </div>
     </div>
 
     <header class="p-6 flex justify-between items-center border-b border-slate-800 sticky top-0 bg-[#0f172a]/80 backdrop-blur-md z-10">
-        <div>
-            <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">WarungPro</h1>
-            <p class="text-xs text-slate-500 font-medium tracking-wide">MANAJEMEN KEUANGAN MODERN</p>
+        <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">WarungPro</h1>
+        <div class="flex gap-2">
+            <button onclick="showTab('transaksi')" id="btnTabTrans" class="text-xs font-bold tab-active px-2 py-1">KEUANGAN</button>
+            <button onclick="showTab('bon')" id="btnTabBon" class="text-xs font-bold text-slate-500 px-2 py-1">CATATAN BON</button>
         </div>
-        <button onclick="if(confirm('Hapus semua data?')) { localStorage.clear(); location.reload(); }" class="h-10 w-10 rounded-xl bg-slate-800 flex items-center justify-center text-rose-500 border border-slate-700">🗑</button>
     </header>
 
     <main class="p-4 max-w-5xl mx-auto space-y-6">
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="glass-card p-5 rounded-2xl">
-                <p class="text-slate-400 text-sm">Total Pemasukan</p>
-                <h3 id="totalIn" class="text-2xl font-bold text-emerald-400">Rp 0</h3>
+        <div id="section-transaksi" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="glass-card p-5 rounded-2xl">
+                    <p class="text-slate-400 text-sm">Pemasukan</p>
+                    <h3 id="totalIn" class="text-2xl font-bold text-emerald-400">Rp 0</h3>
+                </div>
+                <div class="glass-card p-5 rounded-2xl">
+                    <p class="text-slate-400 text-sm">Pengeluaran</p>
+                    <h3 id="totalOut" class="text-2xl font-bold text-rose-400">Rp 0</h3>
+                </div>
+                <div class="glass-card p-5 rounded-2xl border-l-4 border-l-blue-500">
+                    <p class="text-slate-400 text-sm font-bold">Saldo</p>
+                    <h3 id="balance" class="text-2xl font-bold text-blue-400">Rp 0</h3>
+                </div>
             </div>
-            <div class="glass-card p-5 rounded-2xl">
-                <p class="text-slate-400 text-sm">Total Pengeluaran & Gaji</p>
-                <h3 id="totalOut" class="text-2xl font-bold text-rose-400">Rp 0</h3>
-            </div>
-            <div class="glass-card p-5 rounded-2xl border-l-4 border-l-blue-500">
-                <p class="text-slate-400 text-sm font-bold">Saldo Bersih</p>
-                <h3 id="balance" class="text-2xl font-bold text-blue-400">Rp 0</h3>
-            </div>
-        </div>
 
-        <div class="glass-card p-6 rounded-3xl">
-            <h3 class="font-semibold mb-4 text-slate-400">Tren Keuangan Minggu Ini</h3>
-            <div style="height: 250px; position: relative;">
+            <div class="glass-card p-6 rounded-3xl h-[250px]">
                 <canvas id="financeChart"></canvas>
             </div>
-        </div>
 
-        <div class="flex flex-wrap gap-2 overflow-x-auto pb-2">
-            <button onclick="openModal('income')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-xl text-sm font-bold transition flex-shrink-0 shadow-lg shadow-emerald-500/20">+ Penghasilan</button>
-            <button onclick="openModal('expense')" class="bg-rose-600 hover:bg-rose-500 text-white px-6 py-3 rounded-xl text-sm font-bold transition flex-shrink-0 shadow-lg shadow-rose-500/20">+ Pengeluaran</button>
-            <button onclick="openModal('salary')" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl text-sm font-bold transition flex-shrink-0 shadow-lg shadow-blue-500/20">+ Gaji Karyawan</button>
-        </div>
-
-        <div class="glass-card rounded-3xl overflow-hidden">
-            <div class="p-5 border-b border-slate-800 flex justify-between items-center">
-                <h3 class="font-bold">Riwayat Transaksi</h3>
-                <span class="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-1 rounded-full font-bold uppercase">Update Otomatis</span>
+            <div class="grid grid-cols-4 gap-2">
+                <button onclick="openModal('income')" class="bg-emerald-600 p-3 rounded-xl text-[10px] font-bold">+ MASUK</button>
+                <button onclick="openModal('expense')" class="bg-rose-600 p-3 rounded-xl text-[10px] font-bold">- KELUAR</button>
+                <button onclick="openModal('salary')" class="bg-blue-600 p-3 rounded-xl text-[10px] font-bold">👤 GAJI</button>
+                <button onclick="openModal('bon')" class="bg-orange-500 p-3 rounded-xl text-[10px] font-bold text-black">📒 BON</button>
             </div>
-            <div id="historyList" class="divide-y divide-slate-800">
-                </div>
+
+            <div class="glass-card rounded-3xl overflow-hidden">
+                <div id="historyList" class="divide-y divide-slate-800"></div>
+            </div>
+        </div>
+
+        <div id="section-bon" class="space-y-4 hidden">
+            <h2 class="text-xl font-bold text-orange-400 px-2">Daftar Hutang Pelanggan</h2>
+            <div id="bonList" class="space-y-3"></div>
         </div>
     </main>
 
     <script>
-        // Inisialisasi Data dari LocalStorage
-        let transactions = JSON.parse(localStorage.getItem('warungV3')) || [];
+        let data = JSON.parse(localStorage.getItem('warungV4')) || { trans: [], bon: [] };
         let currentType = '';
+
+        function showTab(tab) {
+            document.getElementById('section-transaksi').classList.toggle('hidden', tab !== 'transaksi');
+            document.getElementById('section-bon').classList.toggle('hidden', tab !== 'bon');
+            document.getElementById('btnTabTrans').className = tab === 'transaksi' ? 'text-xs font-bold tab-active px-2 py-1' : 'text-xs font-bold text-slate-500 px-2 py-1';
+            document.getElementById('btnTabBon').className = tab === 'bon' ? 'text-xs font-bold tab-active px-2 py-1' : 'text-xs font-bold text-slate-500 px-2 py-1';
+        }
 
         function openModal(type) {
             currentType = type;
-            document.getElementById('modalTitle').innerText = 
-                type === 'income' ? 'Tambah Penghasilan' : (type === 'salary' ? 'Input Gaji' : 'Tambah Pengeluaran');
+            document.getElementById('detail').classList.toggle('hidden', type !== 'bon');
+            document.getElementById('modalTitle').innerText = type === 'bon' ? 'Catat Hutang Baru' : 'Tambah Transaksi';
             document.getElementById('modal').classList.remove('hidden');
         }
 
@@ -93,67 +101,79 @@
             document.getElementById('modal').classList.add('hidden');
             document.getElementById('desc').value = '';
             document.getElementById('amount').value = '';
+            document.getElementById('detail').value = '';
         }
 
         function saveData() {
             const desc = document.getElementById('desc').value;
             const amount = parseInt(document.getElementById('amount').value);
+            const detail = document.getElementById('detail').value;
             
-            if(!desc || !amount) return alert('Mohon isi data dengan lengkap!');
+            if(!desc || !amount) return alert('Lengkapi data!');
 
-            transactions.unshift({
-                id: Date.now(),
-                type: currentType,
-                desc: desc,
-                amount: amount,
-                date: new Date().toLocaleDateString('id-ID', {day: '2-digit', month: 'short'})
-            });
+            const entry = { id: Date.now(), desc, amount, detail, date: new Date().toLocaleDateString('id-ID') };
 
-            localStorage.setItem('warungV3', JSON.stringify(transactions));
+            if(currentType === 'bon') {
+                data.bon.unshift(entry);
+            } else {
+                entry.type = currentType;
+                data.trans.unshift(entry);
+            }
+
+            localStorage.setItem('warungV4', JSON.stringify(data));
             closeModal();
             render();
         }
 
-        function deleteData(id) {
-            transactions = transactions.filter(t => t.id !== id);
-            localStorage.setItem('warungV3', JSON.stringify(transactions));
+        function lunasBon(id) {
+            const bonIdx = data.bon.findIndex(b => b.id === id);
+            const bon = data.bon[bonIdx];
+            // Pindahkan ke pemasukan
+            data.trans.unshift({ ...bon, type: 'income', desc: 'PELUNASAN: ' + bon.desc });
+            data.bon.splice(bonIdx, 1);
+            localStorage.setItem('warungV4', JSON.stringify(data));
+            render();
+            alert('Bon ditandai lunas dan masuk ke kas!');
+        }
+
+        function deleteItem(type, id) {
+            data[type] = data[type].filter(i => i.id !== id);
+            localStorage.setItem('warungV4', JSON.stringify(data));
             render();
         }
 
         function render() {
-            const list = document.getElementById('historyList');
+            const hList = document.getElementById('historyList');
+            const bList = document.getElementById('bonList');
             let tIn = 0, tOut = 0;
-            let chartLabels = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
-            let chartIn = [0,0,0,0,0,0,0], chartOut = [0,0,0,0,0,0,0];
-
-            list.innerHTML = '';
             
-            if(transactions.length === 0) {
-                list.innerHTML = '<div class="p-10 text-center text-slate-600 text-sm italic">Belum ada transaksi</div>';
-            }
-
-            transactions.forEach((t, idx) => {
-                if(t.type === 'income') {
-                    tIn += t.amount;
-                    chartIn[6] += t.amount / 1000; // Contoh visual ke hari ini
-                } else {
-                    tOut += t.amount;
-                    chartOut[6] += t.amount / 1000;
-                }
-
-                const isSalary = t.type === 'salary';
-                const colorClass = t.type === 'income' ? 'text-emerald-400' : (isSalary ? 'text-slate-200' : 'text-rose-400');
-                const borderClass = isSalary ? 'border-l-4 border-l-blue-500' : '';
-
-                list.innerHTML += `
-                    <div class="p-4 flex justify-between items-center hover:bg-slate-800/50 transition ${borderClass}">
-                        <div>
-                            <p class="font-medium text-sm text-slate-200">${t.desc}</p>
-                            <p class="text-[11px] text-slate-500 italic">Kategori: ${t.type.toUpperCase()} | ${t.date}</p>
-                        </div>
+            // Render Transaksi
+            hList.innerHTML = '';
+            data.trans.forEach(t => {
+                if(t.type === 'income') tIn += t.amount; else tOut += t.amount;
+                hList.innerHTML += `
+                    <div class="p-4 flex justify-between items-center">
+                        <div><p class="text-sm font-bold">${t.desc}</p><p class="text-[10px] text-slate-500">${t.type.toUpperCase()} | ${t.date}</p></div>
                         <div class="text-right">
-                            <p class="font-bold ${colorClass}">${t.type === 'income' ? '+' : '-'}Rp ${t.amount.toLocaleString()}</p>
-                            <button onclick="deleteData(${t.id})" class="text-[10px] text-rose-500 hover:text-rose-400 font-bold uppercase tracking-tighter">Hapus</button>
+                            <p class="font-bold ${t.type==='income'?'text-emerald-400':'text-rose-400'}">${t.type==='income'?'+':'-'}Rp ${t.amount.toLocaleString()}</p>
+                            <button onclick="deleteItem('trans', ${t.id})" class="text-[9px] text-rose-500 font-bold uppercase">Hapus</button>
+                        </div>
+                    </div>`;
+            });
+
+            // Render Bon
+            bList.innerHTML = '';
+            data.bon.forEach(b => {
+                bList.innerHTML += `
+                    <div class="glass-card p-4 rounded-2xl border-l-4 border-orange-500">
+                        <div class="flex justify-between items-start mb-2">
+                            <div><p class="font-bold text-orange-400">${b.desc}</p><p class="text-[10px] text-slate-500">${b.date}</p></div>
+                            <p class="font-bold text-lg">Rp ${b.amount.toLocaleString()}</p>
+                        </div>
+                        <p class="text-xs text-slate-300 bg-slate-800/50 p-2 rounded-lg mb-3">📋 ${b.detail || 'Tidak ada detail'}</p>
+                        <div class="flex gap-2">
+                            <button onclick="lunasBon(${b.id})" class="flex-1 bg-emerald-600 text-[10px] font-bold py-2 rounded-lg uppercase text-white shadow-lg">Tandai Lunas</button>
+                            <button onclick="deleteItem('bon', ${b.id})" class="bg-slate-700 text-[10px] px-4 rounded-lg">Hapus</button>
                         </div>
                     </div>`;
             });
@@ -161,56 +181,24 @@
             document.getElementById('totalIn').innerText = 'Rp ' + tIn.toLocaleString();
             document.getElementById('totalOut').innerText = 'Rp ' + tOut.toLocaleString();
             document.getElementById('balance').innerText = 'Rp ' + (tIn - tOut).toLocaleString();
-
-            updateChart(chartIn, chartOut);
+            updateChart();
         }
 
         let myChart;
-        function updateChart(dataIn, dataOut) {
+        function updateChart() {
             const ctx = document.getElementById('financeChart').getContext('2d');
-            if (myChart) myChart.destroy();
-
+            if(myChart) myChart.destroy();
             myChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'],
-                    datasets: [
-                        {
-                            label: 'Masuk (k)',
-                            data: dataIn,
-                            borderColor: '#10b981',
-                            tension: 0.4,
-                            borderWidth: 2,
-                            pointRadius: 3,
-                            fill: false
-                        },
-                        {
-                            label: 'Keluar (k)',
-                            data: dataOut,
-                            borderColor: '#f43f5e',
-                            tension: 0.4,
-                            borderWidth: 2,
-                            pointRadius: 3,
-                            fill: false
-                        }
-                    ]
+                    datasets: [{ label: 'Kas', data: [0,0,0,0,0,0,10], borderColor: '#3b82f6', tension: 0.4, borderWidth: 2, pointRadius: 0 }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { 
-                        legend: { labels: { color: '#94a3b8', font: { size: 10 } } } 
-                    },
-                    scales: {
-                        y: { grid: { color: '#1e293b' }, ticks: { color: '#64748b', font: { size: 10 } } },
-                        x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 10 } } }
-                    },
-                    interaction: { intersect: false, mode: 'index' }
-                }
+                options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#475569' } } } }
             });
         }
 
         render();
     </script>
 </body>
-</html>
+    </html>
