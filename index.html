@@ -121,16 +121,17 @@
         data: {
             labels: ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'],
             datasets: [{
+                        datasets: [{
                 label: 'Pemasukan',
                 data: [1200000, 1900000, 1500000, 2500000, 2200000, 3000000, 4500000],
                 borderColor: '#10b981',
                 backgroundColor: gradientIn,
                 fill: true,
                 tension: 0.4,
-                borderWidth: 3,
-                pointRadius: 4, // Titik muncul kecil
-                pointHoverRadius: 8, // Titik membesar pas diklik/sentuh
-                pointHitRadius: 30, // Area sentuh lebih luas (enak buat HP)
+                borderWidth: 2, // Garis agak tipis biar elegan
+                pointRadius: 2, // Titik asli kecil banget
+                pointHoverRadius: 5, // Titik membesar pas disentuh
+                pointHitRadius: 30,
                 pointBackgroundColor: '#10b981',
             }, {
                 label: 'Pengeluaran',
@@ -139,9 +140,9 @@
                 backgroundColor: gradientOut,
                 fill: true,
                 tension: 0.4,
-                borderWidth: 3,
-                pointRadius: 4,
-                pointHoverRadius: 8,
+                borderWidth: 2,
+                pointRadius: 2,
+                pointHoverRadius: 5,
                 pointHitRadius: 30,
                 pointBackgroundColor: '#f43f5e',
             }]
