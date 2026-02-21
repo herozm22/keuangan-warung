@@ -104,63 +104,97 @@
     </main>
 
     <script>
-        const ctx = document.getElementById('financeChart').getContext('2d');
+    const ctx = document.getElementById('financeChart').getContext('2d');
 
-        // Gradient Biru Kehijauan (Pemasukan)
-        const gradientIn = ctx.createLinearGradient(0, 0, 0, 300);
-        gradientIn.addColorStop(0, 'rgba(16, 185, 129, 0.3)');
-        gradientIn.addColorStop(1, 'rgba(16, 185, 129, 0)');
+    // Gradient Hijau (Pemasukan)
+    const gradientIn = ctx.createLinearGradient(0, 0, 0, 300);
+    gradientIn.addColorStop(0, 'rgba(16, 185, 129, 0.3)');
+    gradientIn.addColorStop(1, 'rgba(16, 185, 129, 0)');
 
-        // Gradient Merah (Pengeluaran)
-        const gradientOut = ctx.createLinearGradient(0, 0, 0, 300);
-        gradientOut.addColorStop(0, 'rgba(244, 63, 94, 0.3)');
-        gradientOut.addColorStop(1, 'rgba(244, 63, 94, 0)');
+    // Gradient Merah (Pengeluaran)
+    const gradientOut = ctx.createLinearGradient(0, 0, 0, 300);
+    gradientOut.addColorStop(0, 'rgba(244, 63, 94, 0.3)');
+    gradientOut.addColorStop(1, 'rgba(244, 63, 94, 0)');
 
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'],
-                datasets: [{
-                    label: 'Pemasukan',
-                    data: [120, 190, 150, 250, 220, 300, 450], // Data dummy (dlm ribuan)
-                    borderColor: '#10b981',
-                    backgroundColor: gradientIn,
-                    fill: true,
-                    tension: 0.4,
-                    borderWidth: 3,
-                    pointRadius: 0,
-                    pointHoverRadius: 6
-                }, {
-                    label: 'Pengeluaran',
-                    data: [80, 120, 100, 150, 120, 200, 100],
-                    borderColor: '#f43f5e',
-                    backgroundColor: gradientOut,
-                    fill: true,
-                    tension: 0.4,
-                    borderWidth: 3,
-                    pointRadius: 0,
-                    pointHoverRadius: 6
-                }]
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'],
+            datasets: [{
+                label: 'Pemasukan',
+                data: [1200000, 1900000, 1500000, 2500000, 2200000, 3000000, 4500000],
+                borderColor: '#10b981',
+                backgroundColor: gradientIn,
+                fill: true,
+                tension: 0.4,
+                borderWidth: 3,
+                pointRadius: 4, // Titik muncul kecil
+                pointHoverRadius: 8, // Titik membesar pas diklik/sentuh
+                pointHitRadius: 30, // Area sentuh lebih luas (enak buat HP)
+                pointBackgroundColor: '#10b981',
+            }, {
+                label: 'Pengeluaran',
+                data: [800000, 1200000, 1000000, 1500000, 1200000, 2000000, 1000000],
+                borderColor: '#f43f5e',
+                backgroundColor: gradientOut,
+                fill: true,
+                tension: 0.4,
+                borderWidth: 3,
+                pointRadius: 4,
+                pointHoverRadius: 8,
+                pointHitRadius: 30,
+                pointBackgroundColor: '#f43f5e',
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false, // Biar asal sentuh di area garis langsung muncul infonya
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { labels: { color: '#94a3b8', font: { size: 12, weight: '600' } } }
+            plugins: {
+                legend: { 
+                    display: true,
+                    labels: { color: '#94a3b8', font: { size: 12, weight: '600' } } 
                 },
-                scales: {
-                    y: { 
-                        grid: { color: 'rgba(30, 41, 59, 0.5)', drawBorder: false },
-                        ticks: { color: '#94a3b8' }
-                    },
-                    x: { 
-                        grid: { display: false },
-                        ticks: { color: '#94a3b8' }
+                tooltip: {
+                    enabled: true,
+                    backgroundColor: '#1e293b',
+                    titleColor: '#f8fafc',
+                    bodyColor: '#f8fafc',
+                    borderColor: '#334155',
+                    borderWidth: 1,
+                    padding: 12,
+                    displayColors: true,
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) { label += ': '; }
+                            if (context.parsed.y !== null) {
+                                label += new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(context.parsed.y);
+                            }
+                            return label;
+                        }
                     }
                 }
+            },
+            scales: {
+                y: { 
+                    grid: { color: 'rgba(30, 41, 59, 0.5)', drawBorder: false },
+                    ticks: { 
+                        color: '#94a3b8',
+                        callback: function(value) { return 'Rp ' + value.toLocaleString(); }
+                    }
+                },
+                x: { 
+                    grid: { display: false },
+                    ticks: { color: '#94a3b8' }
+                }
             }
-        });
-    </script>
+        }
+    });
+</script>
 </body>
     </html>
             
